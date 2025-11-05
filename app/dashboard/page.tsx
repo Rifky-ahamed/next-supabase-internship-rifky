@@ -22,9 +22,22 @@ export default function DashboardPage() {
 
   // 🧠 Fetch tasks
   const fetchTasks = async () => {
-    const { data, error } = await supabase.from("tasks").select("*").order("created_at", { ascending: false });
-    if (!error && data) setTasks(data);
-  };
+  const { data: userData } = await supabase.auth.getUser();
+  const user = userData?.user;
+
+  if (!user) {
+    setTasks([]);
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("tasks")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (!error && data) setTasks(data);
+};
 
   useEffect(() => {
     fetchTasks();
@@ -32,22 +45,31 @@ export default function DashboardPage() {
 
   // ➕ Create / Update Task
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
+  if (!title || !date || !time) return alert("Please fill all fields");
 
-    if (!title || !date || !time) return alert("Please fill all fields");
+  // Get current user
+  const { data: userData } = await supabase.auth.getUser();
+  const user = userData?.user;
 
-    if (editId) {
-      await supabase.from("tasks").update({ title, date, time }).eq("id", editId);
-      setEditId(null);
-    } else {
-      await supabase.from("tasks").insert([{ title, date, time }]);
-    }
+  if (!user) {
+    alert("You must be logged in to create a task");
+    return;
+  }
 
-    setTitle("");
-    setDate("");
-    setTime("");
-    fetchTasks();
-  };
+  if (editId) {
+    await supabase.from("tasks").update({ title, date, time }).eq("id", editId).eq("user_id", user.id);
+    setEditId(null);
+  } else {
+    await supabase.from("tasks").insert([{ title, date, time, user_id: user.id }]);
+  }
+
+  setTitle("");
+  setDate("");
+  setTime("");
+  fetchTasks();
+};
+
 
   // 🗑 Delete Task
   const deleteTask = async (id: string) => {
