@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuLink,
-} from "@/components/ui/navigation-menu"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu } from "lucide-react"
+} from "@/components/ui/navigation-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <nav className="border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -27,25 +27,36 @@ export default function Navbar() {
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList>
             <NavigationMenuItem>
-              <Link href="/" legacyBehavior passHref>
-                <NavigationMenuLink className="px-4 py-2 hover:text-primary transition-colors">
+              <NavigationMenuLink asChild>
+                <Link
+                  href="/"
+                  className="px-4 py-2 hover:text-primary transition-colors"
+                >
                   Home
-                </NavigationMenuLink>
-              </Link>
+                </Link>
+              </NavigationMenuLink>
             </NavigationMenuItem>
+
             <NavigationMenuItem>
-              <Link href="/about" legacyBehavior passHref>
-                <NavigationMenuLink className="px-4 py-2 hover:text-primary transition-colors">
+              <NavigationMenuLink asChild>
+                <Link
+                  href="/about"
+                  className="px-4 py-2 hover:text-primary transition-colors"
+                >
                   About
-                </NavigationMenuLink>
-              </Link>
+                </Link>
+              </NavigationMenuLink>
             </NavigationMenuItem>
+
             <NavigationMenuItem>
-              <Link href="/dashboard" legacyBehavior passHref>
-                <NavigationMenuLink className="px-4 py-2 hover:text-primary transition-colors">
+              <NavigationMenuLink asChild>
+                <Link
+                  href="/dashboard"
+                  className="px-4 py-2 hover:text-primary transition-colors"
+                >
                   Dashboard
-                </NavigationMenuLink>
-              </Link>
+                </Link>
+              </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
@@ -59,13 +70,19 @@ export default function Navbar() {
           </SheetTrigger>
           <SheetContent side="right" className="p-4">
             <div className="flex flex-col gap-4">
-              <Link href="/" onClick={() => setOpen(false)}>Home</Link>
-              <Link href="/about" onClick={() => setOpen(false)}>About</Link>
-              <Link href="/dashboard" onClick={() => setOpen(false)}>Dashboard</Link>
+              <Link href="/" onClick={() => setOpen(false)}>
+                Home
+              </Link>
+              <Link href="/about" onClick={() => setOpen(false)}>
+                About
+              </Link>
+              <Link href="/dashboard" onClick={() => setOpen(false)}>
+                Dashboard
+              </Link>
             </div>
           </SheetContent>
         </Sheet>
       </div>
     </nav>
-  )
+  );
 }
