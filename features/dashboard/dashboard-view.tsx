@@ -2,23 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { Task } from "./dashboard.types";
-import {
-  fetchTasks,
-  saveTask,
-  deleteTaskById,
-} from "./dashboard.service";
+import { fetchTasks, saveTask, deleteTaskById } from "./dashboard.service";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import DashboardForm from "./dashboard-form";
 
 const DashboardView = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [title, setTitle] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+  const [editTask, setEditTask] = useState<Task | null>(null);
 
-  // 🧠 Load tasks on component mount
   useEffect(() => {
     loadTasks();
   }, []);
@@ -28,30 +20,12 @@ const DashboardView = () => {
     setTasks(data);
   };
 
-  // ➕ Create / Update task
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title || !date || !time) return alert("Please fill all fields");
-
-    await saveTask({ title, date, time }, editId || undefined);
-
-    // Reset form
-    setTitle("");
-    setDate("");
-    setTime("");
-    setEditId(null);
+  const handleFormSubmit = async (data: { title: string; date: string; time: string }, editId?: string) => {
+    await saveTask(data, editId);
+    setEditTask(null);
     loadTasks();
   };
 
-  // ✏️ Edit task
-  const editTask = (task: Task) => {
-    setEditId(task.id);
-    setTitle(task.title);
-    setDate(task.date);
-    setTime(task.time);
-  };
-
-  // 🗑 Delete task
   const handleDelete = async (id: string) => {
     await deleteTaskById(id);
     loadTasks();
@@ -61,37 +35,8 @@ const DashboardView = () => {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-primary">Task Dashboard</h1>
 
-      {/* Task Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{editId ? "Edit Task" : "Add Task"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Input
-              type="text"
-              placeholder="Task title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <div className="flex gap-4">
-              <Input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-              <Input
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-              />
-            </div>
-            <Button type="submit">
-              {editId ? "Update Task" : "Add Task"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+      {/* Task Form Component */}
+      <DashboardForm onSubmit={handleFormSubmit} editTask={editTask} />
 
       {/* Task List */}
       <div className="grid gap-4">
@@ -108,13 +53,10 @@ const DashboardView = () => {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => editTask(task)}>
+                  <Button variant="outline" onClick={() => setEditTask(task)}>
                     Edit
                   </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleDelete(task.id)}
-                  >
+                  <Button variant="destructive" onClick={() => handleDelete(task.id)}>
                     Delete
                   </Button>
                 </div>
@@ -125,5 +67,6 @@ const DashboardView = () => {
       </div>
     </div>
   );
-}
+};
+
 export default DashboardView;
